@@ -57,7 +57,7 @@ func ValidFirstOrLastCharacters(eq string) bool {
 	eqLength := len(eq)
 
 	// check first character
-	invalidFirstCharacter := regexp.MustCompile(`[*/+)-]`).MatchString(string(eq[0]))
+	invalidFirstCharacter := regexp.MustCompile(`[*/)]`).MatchString(string(eq[0]))
 	if invalidFirstCharacter {
 		return false
 	}
@@ -67,13 +67,13 @@ func ValidFirstOrLastCharacters(eq string) bool {
 	return !invalidLastCharacter
 }
 
-// IsRepeatedSigns: check if there is any repeated calculations sign (e.g. '++', '**', etc.)
+// IsRepeatedSigns: check if there is any repeated invalid sign (e.g. '//', '**', etc.)
 func IsRepeatedSigns(eq string) bool {
 
 	for i := 0; i < len(eq)-1; i++ {
 
-		if regexp.MustCompile(`[()*/+-]`).MatchString(string(eq[i])) &&
-			regexp.MustCompile(`[()*/+-]`).MatchString(string(eq[i+1])) {
+		if regexp.MustCompile(`[()*/]`).MatchString(string(eq[i])) &&
+			regexp.MustCompile(`[()*/]`).MatchString(string(eq[i+1])) {
 			return true
 		}
 	}
