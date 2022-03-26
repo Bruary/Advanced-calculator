@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"regexp"
+
+	seg "github.com/Bruary/Advanced-calculator/segmentation"
 )
 
 func main() {
@@ -41,6 +43,9 @@ func main() {
 	fmt.Println("Equation is valid. proceed ahead.")
 
 	// Segment
+	segments := seg.ParseEquation(equation)
+
+	fmt.Println("the segments created: ", segments)
 
 	// compute
 
@@ -79,4 +84,15 @@ func IsRepeatedSigns(eq string) bool {
 	}
 
 	return false
+}
+
+func Compute(equations []seg.Segment) {
+	var levelOneComputation float64
+	var levelTwoComputation float64
+
+	for i := 0; i < len(equations); i++ {
+		if equations[i].Level == 1 {
+
+		}
+	}
 }
