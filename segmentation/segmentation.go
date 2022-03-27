@@ -66,3 +66,50 @@ func ParseEquation(equation string) []Segment {
 
 	return segments
 }
+
+func LowLevelParsing(segment Segment) []Token {
+
+	var chars = []string(strings.Split(segment.Equation, ""))
+	tokens := []Token{}
+	token := Token{}
+
+	for i := 0; i < len(chars); i++ {
+
+		if chars[i] == "*" ||
+			chars[i] == "/" ||
+			chars[i] == "+" ||
+			chars[i] == "-" &&
+				i != 0 {
+
+			tokens = append(tokens, token)
+			token = Token{}
+		}
+
+		if chars[i] == "*" {
+			token.Sign = "*"
+			token.Order = 1
+
+		} else if chars[i] == "/" {
+			token.Sign = "/"
+			token.Order = 2
+
+		} else if chars[i] == "+" {
+			token.Sign = "+"
+			token.Order = 3
+
+		} else if chars[i] == "-" {
+			token.Sign = "-"
+			token.Order = 4
+
+		} else {
+			if token.Sign == "" {
+				token.Sign = "+"
+				token.Order = 3
+			}
+			token.Number += chars[i]
+		}
+
+	}
+
+	return tokens
+}
