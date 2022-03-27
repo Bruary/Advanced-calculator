@@ -44,8 +44,15 @@ func main() {
 
 	// Segment
 	segments := seg.ParseEquation(equation)
-
 	fmt.Println("the segments created: ", segments)
+
+	var tokens []seg.Token
+
+	for i := 0; i < len(segments); i++ {
+		tokens = append(tokens, seg.LowLevelParsing(segments[i])...)
+	}
+
+	fmt.Println("The tokens: ", tokens)
 
 	// compute
 
@@ -86,13 +93,15 @@ func IsRepeatedSigns(eq string) bool {
 	return false
 }
 
-func Compute(equations []seg.Segment) {
-	var levelOneComputation float64
-	var levelTwoComputation float64
+// func Compute(equations []seg.Segment) {
+// 	var levelOneComputation float64
+// 	var levelTwoComputation float64
 
-	for i := 0; i < len(equations); i++ {
-		if equations[i].Level == 1 {
+// 	for i := 0; i < len(equations); i++ {
+// 		if equations[i].Level == 1 {
+// 			for i := 0; i < len(equations[i].Equation); i++ {
 
-		}
-	}
-}
+// 			}
+// 		}
+// 	}
+// }
