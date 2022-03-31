@@ -78,11 +78,13 @@ func LowLevelParsing(segment Segment) []Token {
 		if chars[i] == "*" ||
 			chars[i] == "/" ||
 			chars[i] == "+" ||
-			chars[i] == "-" &&
-				i != 0 {
+			chars[i] == "-" {
 
-			tokens = append(tokens, token)
-			token = Token{}
+			if i != 0 {
+				tokens = append(tokens, token)
+				token = Token{}
+
+			}
 		}
 
 		if chars[i] == "*" {
@@ -109,6 +111,10 @@ func LowLevelParsing(segment Segment) []Token {
 			token.Number += chars[i]
 		}
 
+	}
+
+	if (token != Token{}) {
+		tokens = append(tokens, token)
 	}
 
 	return tokens
