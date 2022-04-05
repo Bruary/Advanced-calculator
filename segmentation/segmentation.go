@@ -22,7 +22,7 @@ func ParseEquation(equation string) []Segment {
 
 			// check if the singleSegment is filled or not
 			// if filled then append it to the main array and reset it
-			if (singleSegment != Segment{}) {
+			if singleSegment.Level != 0 {
 				// apend to main array
 				segments = append(segments, singleSegment)
 				// reset singleSegment
@@ -57,7 +57,7 @@ func ParseEquation(equation string) []Segment {
 
 	// check if the singleSegment is filled or not
 	// if filled then append it to the main array and reset it
-	if (singleSegment != Segment{}) {
+	if singleSegment.Level != 0 {
 		// apend to main array
 		segments = append(segments, singleSegment)
 		// reset singleSegment
@@ -69,12 +69,21 @@ func ParseEquation(equation string) []Segment {
 
 func LowLevelParsing(segment Segment) []Token {
 
+	// Split the string into characters
 	var chars = []string(strings.Split(segment.Equation, ""))
 	tokens := []Token{}
 	token := Token{}
 
+	// if the segment is inside a braket initially then make sure 'isInsideBrackets' is set to true
+	isInsideBrackets := false
+
+	if segment.Level == 1 {
+		isInsideBrackets = true
+	}
+
 	for i := 0; i < len(chars); i++ {
 
+		// After finding a sign, make sure to append the previous token and reset
 		if chars[i] == "*" ||
 			chars[i] == "/" ||
 			chars[i] == "+" ||
@@ -90,29 +99,35 @@ func LowLevelParsing(segment Segment) []Token {
 		if chars[i] == "*" {
 			token.Sign = "*"
 			token.Order = 1
+			token.InsideBrackets = isInsideBrackets
 
 		} else if chars[i] == "/" {
 			token.Sign = "/"
 			token.Order = 2
+			token.InsideBrackets = isInsideBrackets
 
 		} else if chars[i] == "+" {
 			token.Sign = "+"
 			token.Order = 3
+			token.InsideBrackets = isInsideBrackets
 
 		} else if chars[i] == "-" {
 			token.Sign = "-"
 			token.Order = 4
+			token.InsideBrackets = isInsideBrackets
 
 		} else {
 			if token.Sign == "" {
 				token.Sign = "+"
 				token.Order = 3
+				token.InsideBrackets = isInsideBrackets
 			}
 			token.Number += chars[i]
 		}
 
 	}
 
+	// if characters array ended, make sure to append the last token if exists
 	if (token != Token{}) {
 		tokens = append(tokens, token)
 	}
