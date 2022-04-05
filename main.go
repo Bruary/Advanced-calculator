@@ -46,15 +46,17 @@ func main() {
 	segments := seg.ParseEquation(equation)
 	fmt.Println("the segments created: ", segments)
 
-	var tokens []seg.Token
+	//var tokens []seg.Token
 
 	for i := 0; i < len(segments); i++ {
-		tokens = append(tokens, seg.LowLevelParsing(segments[i])...)
+		segments[i].Tokens = append(segments[i].Tokens, seg.LowLevelParsing(segments[i])...)
+		fmt.Println("The tokens: ", segments[i].Tokens)
 	}
 
-	fmt.Println("The tokens: ", tokens)
-
 	// compute
+	for j := 0; j < len(segments); j++ {
+		segments[j].ComputedValue = Compute(segments[j].Tokens)
+	}
 
 }
 
@@ -93,15 +95,16 @@ func IsRepeatedSigns(eq string) bool {
 	return false
 }
 
-// func Compute(equations []seg.Segment) {
-// 	var levelOneComputation float64
-// 	var levelTwoComputation float64
+func Compute(tokens []seg.Token) float64 {
 
-// 	for i := 0; i < len(equations); i++ {
-// 		if equations[i].Level == 1 {
-// 			for i := 0; i < len(equations[i].Equation); i++ {
+	// Compute each one and add the computed value to the object value in Token
 
-// 			}
-// 		}
-// 	}
-// }
+	for i := 0; i < len(tokens); i++ {
+		switch tokens[i].Sign {
+		case "*":
+
+		}
+	}
+
+	return 0.0
+}
