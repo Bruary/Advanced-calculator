@@ -55,8 +55,18 @@ func main() {
 	}
 
 	// compute
+	// Trying to make a recursive loop
+	// return less tokens each iteration untill all tokens are computed
+	// in the end, if only one token is left then take that value as final value.
 	for j := 0; j < len(segments); j++ {
-		segments[j].ComputedValue = Compute(segments[j].Tokens)
+		for len(segments[j].Tokens) > 1 {
+			segments[j].Tokens = Compute(segments[j].Tokens)
+			fmt.Println("the tokens after update: ", segments[j].Tokens)
+		}
+		if len(segments[j].Tokens) > 0 {
+			segments[j].ComputedValue = segments[j].Tokens[0].ComputedValue
+		}
+		//fmt.Println("the computed value for segment is = ", segments[j].ComputedValue)
 	}
 
 }
@@ -96,7 +106,7 @@ func IsRepeatedSigns(eq string) bool {
 	return false
 }
 
-func Compute(tokens []seg.Token) float64 {
+func Compute(tokens []seg.Token) []seg.Token {
 
 	// Compute each one and add the computed value to the object value in Token
 	var secondIterationTokens []seg.Token
@@ -104,20 +114,24 @@ func Compute(tokens []seg.Token) float64 {
 	// if there is one token, this token can be + or - and no need to compute a value, just return the number
 	if len(tokens) == 1 && tokens[0].Sign == "+" {
 		number, _ := strconv.ParseFloat(tokens[0].Number, 64)
-		return number
+		tokens[0].ComputedValue = number
+		return tokens
 
 	} else if len(tokens) == 1 && tokens[0].Sign == "-" {
 		number, _ := strconv.ParseFloat(tokens[0].Number, 64)
-		return -number
+		tokens[0].ComputedValue = -number
+		return tokens
+
 	}
 
-	for i := len(tokens) - 1; i >= 0; i-- {
+	for i := len(tokens) - 1; i >= 1; i-- {
 		switch tokens[i].Sign {
 		case "*":
 			num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
 			num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
 
 			tokens[i].ComputedValue = num1 * num2
+			fmt.Println("the computed value  * : ", tokens[i].ComputedValue)
 			i = i - 1
 
 			// since we used the next element in the array already then we need only the current element for next iteration
@@ -128,6 +142,7 @@ func Compute(tokens []seg.Token) float64 {
 			num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
 
 			tokens[i].ComputedValue = num2 / num1
+			fmt.Println("the computed value / : ", tokens[i].ComputedValue)
 			i = i - 1
 
 			secondIterationTokens = append(secondIterationTokens, tokens[i])
@@ -140,6 +155,7 @@ func Compute(tokens []seg.Token) float64 {
 				num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
 
 				tokens[i].ComputedValue = num1 + num2
+				fmt.Println("the computed value + : ", tokens[i].ComputedValue)
 				i = i - 1
 
 				secondIterationTokens = append(secondIterationTokens, tokens[i])
@@ -153,6 +169,7 @@ func Compute(tokens []seg.Token) float64 {
 				num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
 
 				tokens[i].ComputedValue = num2 - num1
+				fmt.Println("the computed value - : ", tokens[i].ComputedValue)
 				i = i - 1
 
 				secondIterationTokens = append(secondIterationTokens, tokens[i])
@@ -161,50 +178,5 @@ func Compute(tokens []seg.Token) float64 {
 
 	}
 
-	for j := len(secondIterationTokens) - 1; j >= 0; j-- {
-
-		switch secondIterationTokens[j].Sign {
-		case "*":
-			num1 := secondIterationTokens[j].ComputedValue
-			num2 := secondIterationTokens[j-1].ComputedValue
-
-			secondIterationTokens[j].ComputedValue = num1 * num2
-			j = j - 1
-
-		case "/":
-			num1 := secondIterationTokens[j].ComputedValue
-			num2 := secondIterationTokens[j-1].ComputedValue
-
-			secondIterationTokens[j].ComputedValue = num2 / num1
-			j = j - 1
-
-		case "+":
-			if secondIterationTokens[j-1].Sign == "*" ||
-				secondIterationTokens[j-1].Sign == "/" {
-
-				num1 := secondIterationTokens[j].ComputedValue
-				num2 := secondIterationTokens[j-1].ComputedValue
-
-				secondIterationTokens[j].ComputedValue = num1 + num2
-				j = j - 1
-			}
-
-		case "-":
-			if secondIterationTokens[j-1].Sign == "*" ||
-				secondIterationTokens[j-1].Sign == "/" {
-
-				num1 := secondIterationTokens[j].ComputedValue
-				num2 := secondIterationTokens[j-1].ComputedValue
-
-				secondIterationTokens[j].ComputedValue = num2 - num1
-				j = j - 1
-			}
-		}
-
-	}
-
-	// TODO
-	// Maybe make the above an recursive function??????????
-
-	return 0.0
+	return secondIterationTokens
 }
