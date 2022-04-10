@@ -63,11 +63,21 @@ func main() {
 			segments[j].Tokens = Compute(segments[j].Tokens)
 			fmt.Println("the tokens after update: ", segments[j].Tokens)
 		}
-		if len(segments[j].Tokens) > 0 {
+		if len(segments[j].Tokens) == 1 {
 			segments[j].ComputedValue = segments[j].Tokens[0].ComputedValue
 		}
 		//fmt.Println("the computed value for segment is = ", segments[j].ComputedValue)
 	}
+
+	// Finally loop through the computed values for segments and just add them to find the final result
+	var finalResult float64
+
+	for k := 0; k < len(segments); k++ {
+		finalResult += segments[k].ComputedValue
+	}
+
+	fmt.Println("")
+	fmt.Println("Final Result: ", finalResult)
 
 }
 
@@ -124,55 +134,125 @@ func Compute(tokens []seg.Token) []seg.Token {
 
 	}
 
-	for i := len(tokens) - 1; i >= 1; i-- {
+	for i := len(tokens) - 1; i >= 0; i-- {
+
+		// if the tokens where already computed and a computed value exists
+		// then just add the two values
+		if i != 0 &&
+			tokens[i].ComputedValue != 0 &&
+			tokens[i-1].ComputedValue != 0 {
+
+			num1 := tokens[i].ComputedValue
+			num2 := tokens[i-1].ComputedValue
+
+			tokens[i].ComputedValue = num1 + num2
+			fmt.Println("the computed value  * (computed branch) : ", tokens[i].ComputedValue)
+
+			secondIterationTokens = append(secondIterationTokens, tokens[i])
+			i = i - 1
+
+			continue
+		}
+
 		switch tokens[i].Sign {
 		case "*":
 			num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
-			num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
+			var num2 float64
+
+			// check if num2 is a negative number
+			if tokens[i-1].Sign == "-" {
+				num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+				num2 = -num2
+			} else {
+				num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+			}
 
 			tokens[i].ComputedValue = num1 * num2
 			fmt.Println("the computed value  * : ", tokens[i].ComputedValue)
-			i = i - 1
 
 			// since we used the next element in the array already then we need only the current element for next iteration
 			secondIterationTokens = append(secondIterationTokens, tokens[i])
+			i = i - 1
 
 		case "/":
 			num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
-			num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
+			var num2 float64
+
+			if tokens[i-1].Sign == "-" {
+				num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+				num2 = -num2
+			} else {
+				num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+			}
 
 			tokens[i].ComputedValue = num2 / num1
 			fmt.Println("the computed value / : ", tokens[i].ComputedValue)
-			i = i - 1
 
 			secondIterationTokens = append(secondIterationTokens, tokens[i])
+			i = i - 1
 
 		case "+":
-			if tokens[i-1].Sign == "*" ||
-				tokens[i-1].Sign == "/" {
+			// if i is zero, then just return the number
+			if i == 0 {
 
 				num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
-				num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
+
+				tokens[i].ComputedValue = num1
+				fmt.Println("the computed value + : ", tokens[i].ComputedValue)
+
+				secondIterationTokens = append(secondIterationTokens, tokens[i])
+
+			} else if tokens[i-1].Sign != "*" &&
+				tokens[i-1].Sign != "/" {
+
+				num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
+				var num2 float64
+
+				if tokens[i-1].Sign == "-" {
+					num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+					num2 = -num2
+				} else {
+					num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+				}
 
 				tokens[i].ComputedValue = num1 + num2
 				fmt.Println("the computed value + : ", tokens[i].ComputedValue)
-				i = i - 1
 
 				secondIterationTokens = append(secondIterationTokens, tokens[i])
+				i = i - 1
+
 			}
 
 		case "-":
-			if tokens[i-1].Sign == "*" ||
-				tokens[i-1].Sign == "/" {
+			if i == 0 {
 
 				num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
-				num2, _ := strconv.ParseFloat(tokens[i-1].Number, 64)
+
+				tokens[i].ComputedValue = -num1
+				fmt.Println("the computed value + : ", tokens[i].ComputedValue)
+
+				secondIterationTokens = append(secondIterationTokens, tokens[i])
+
+			} else if tokens[i-1].Sign != "*" &&
+				tokens[i-1].Sign != "/" {
+
+				num1, _ := strconv.ParseFloat(tokens[i].Number, 64)
+				var num2 float64
+
+				if tokens[i-1].Sign == "-" {
+					num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+					num2 = -num2
+				} else {
+					num2, _ = strconv.ParseFloat(tokens[i-1].Number, 64)
+				}
 
 				tokens[i].ComputedValue = num2 - num1
 				fmt.Println("the computed value - : ", tokens[i].ComputedValue)
-				i = i - 1
 
 				secondIterationTokens = append(secondIterationTokens, tokens[i])
+
+				i = i - 1
+
 			}
 		}
 
